@@ -16,7 +16,7 @@
         .table-container::-webkit-scrollbar-track { background: #f1f1f1; }
         .table-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
         
-        .status-cell { text-align: center; vertical-align: middle; position: relative; }
+        .status-cell { text-align: center; vertical-align: top; position: relative; }
         .icon-check { color: #10b981; } 
         .icon-late { color: #ef4444; } 
         .icon-none { color: #cbd5e1; } 
@@ -32,9 +32,34 @@
         select.status-select:focus, select.mech-select:focus, .edit-input:focus { outline: 2px solid #2563eb; }
         .edit-input { width: 100%; padding: 4px 8px; border: 1px solid #3b82f6; border-radius: 4px; font-size: 0.875rem; background-color: white; }
         textarea.edit-input { resize: vertical; min-height: 60px; }
+        textarea.progress-input { min-height: 44px; font-size: 0.7rem; line-height: 1.2; padding: 4px; resize: vertical; }
+        
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        #db-loading {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.95); z-index: 100;
+            display: flex; justify-content: center; align-items: center;
+            font-weight: bold; color: #3b82f6; flex-direction: column; gap: 15px; text-align: center; padding: 20px;
+        }
     </style>
 </head>
 <body class="p-2 md:p-6 text-slate-800">
+
+    <!-- Loading Indicator -->
+    <div id="db-loading">
+        <i class="fas fa-circle-notch fa-spin text-4xl text-blue-600"></i>
+        <div>
+            <span id="loading-text" class="text-lg text-slate-800 block">Menghubungkan ke Database...</span>
+            <span id="loading-subtext" class="text-sm text-slate-500 font-normal mt-1 block">Mohon tunggu...</span>
+        </div>
+        <button onclick="window.forceOfflineMode()" class="mt-4 px-4 py-2 bg-slate-200 text-slate-700 rounded text-sm hover:bg-slate-300 font-medium">Lewati Pemuatan</button>
+    </div>
 
     <!-- Header Section -->
     <div class="mb-6 bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row items-center justify-between">
@@ -126,14 +151,14 @@
                     <thead>
                         <tr class="bg-slate-50 text-slate-500 text-xs font-semibold uppercase tracking-wider border-b border-slate-200">
                             <th class="p-4 w-10 text-center">No</th>
-                            <th class="p-4 min-w-[200px]">Unit Kerja</th>
-                            <th class="p-4 w-16 text-center" data-month="0">Jan</th>
-                            <th class="p-4 w-16 text-center" data-month="1">Feb</th>
-                            <th class="p-4 w-16 text-center" data-month="2">Mar</th>
-                            <th class="p-4 w-16 text-center" data-month="3">Apr</th>
-                            <th class="p-4 w-16 text-center" data-month="4">Mei</th>
-                            <th class="p-4 w-16 text-center" data-month="5">Jun</th>
-                            <th class="p-4 w-24 text-center bg-blue-50 text-blue-800">Akhir</th>
+                            <th class="p-4 min-w-[180px]">Unit Kerja</th>
+                            <th class="p-4 min-w-[120px] text-center" data-month="0">Jan</th>
+                            <th class="p-4 min-w-[120px] text-center" data-month="1">Feb</th>
+                            <th class="p-4 min-w-[120px] text-center" data-month="2">Mar</th>
+                            <th class="p-4 min-w-[120px] text-center" data-month="3">Apr</th>
+                            <th class="p-4 min-w-[120px] text-center" data-month="4">Mei</th>
+                            <th class="p-4 min-w-[120px] text-center" data-month="5">Jun</th>
+                            <th class="p-4 min-w-[120px] text-center bg-blue-50 text-blue-800">Akhir</th>
                             <th class="p-4 w-16 text-center">Aksi</th>
                         </tr>
                     </thead>
@@ -167,17 +192,18 @@
         window.isMasterEditMode = false;
         let pendingCallback = null;
 
+        // Data awal termasuk array progress
         window.initialData = [
-            { "id": "1", "unit": "KPKNL Pekanbaru", "kanwil": "Kanwil Riau, Sumbar & Kepri", "title": "Pemanfaatan BMN Sebagian Tanah LPP RRI Pekanbaru Untuk Madani Trade Center", "mech": "Sewa atau Pinjam Pakai Sederhana", "status": ["none", "none", "none", "none", "none", "none", "none"], "ket": "Implemented: perjanjian sewa ada, pemanfaatan aktif" },
-            { "id": "2", "unit": "KPKNL Padang", "kanwil": "Kanwil Riau, Sumbar & Kepri", "title": "Optimalisasi Sebagian Tanah/Bangunan Pelabuhan Perikanan Samudera Bungus untuk Sentra Tuna Sumbar", "mech": "Sewa atau Pinjam Pakai Sederhana", "status": ["none", "none", "none", "none", "none", "none", "none"], "ket": "Implemented (non-komersial): pemanfaatan sosial berjalan dengan dasar perjanjian" },
-            { "id": "3", "unit": "KPKNL Jakarta I", "kanwil": "Kanwil DKI Jakarta", "title": "KSP BMN Berupa Tanah Untuk Pembangunan International Student Housing Pada Universitas Indonesia", "mech": "Sewa atau Pinjam Pakai Sederhana", "status": ["none", "none", "none", "none", "none", "none", "none"], "ket": "Pra-legalisasi: konsep optimalisasi & penjajakan mitra" },
-            { "id": "4", "unit": "KPKNL Jakarta II", "kanwil": "Kanwil DKI Jakarta", "title": "EMPOWERING VOICES: Unified, Inclusive, and Empowered Public Services: State Assets for All", "mech": "Sewa atau Pinjam Pakai Sederhana", "status": ["none", "none", "none", "none", "none", "none", "none"], "ket": "Konseptual: belum masuk tahap persetujuan formal" },
-            { "id": "5", "unit": "KPKNL Jakarta III", "kanwil": "Kanwil DKI Jakarta", "title": "Kawasan Masjid Istiqlal sebagai Ekosistem Aset Berbasis Spiritual, Edukasi, dan Ekonomi Kreatif", "mech": "Sewa atau Pinjam Pakai Kompleks", "status": ["none", "none", "none", "none", "none", "none", "none"], "ket": "Pra-legalisasi: pemetaan & penertiban, belum ada persetujuan/perjanjian" },
-            { "id": "6", "unit": "KPKNL Purwokerto", "kanwil": "Kanwil Jateng & DIY", "title": "Pemanfaatan Farm Manggala Aset BMN Pada Balai Besar Pembibitan Ternak Unggul (Baturraden)", "mech": "Sewa atau Pinjam Pakai Sederhana", "status": ["none", "none", "none", "none", "none", "none", "none"], "ket": "Implemented: pemanfaatan berjalan dengan dasar kontraktual" },
-            { "id": "7", "unit": "KPKNL Malang", "kanwil": "Kanwil Jawa Timur", "title": "PETIK ANGGUR-PETIK ILMU BARENG MAS-EE: Optimalisasi Aset Polbangtan Malang", "mech": "Sewa atau Pinjam Pakai Sederhana", "status": ["none", "none", "none", "none", "none", "none", "none"], "ket": "Fully implemented: persetujuan sewa terbit, perjanjian ditandatangani, PNBP terealisasi, operasional berjalan" },
-            { "id": "8", "unit": "KPKNL Tarakan", "kanwil": "Kanwil Kaltim & Utara", "title": "Optimalisasi Aset di Luar Kawasan Bandar Udara Juwata Tarakan melalui Lelang Hak Menikmati", "mech": "Sewa atau Pinjam Pakai Kompleks", "status": ["none", "none", "none", "none", "none", "none", "none"], "ket": "Pra-implementasi lanjut: penilaian sewa selesai, menunggu persetujuan & lelang" },
-            { "id": "9", "unit": "KPKNL Palopo", "kanwil": "Kanwil Sulsel, Tenggara & Barat", "title": "Optimalisasi BMN Tanah & Bangunan PN Palopo Sebagai Public Value Creation", "mech": "Sewa atau Pinjam Pakai Sederhana", "status": ["none", "none", "none", "none", "none", "none", "none"], "ket": "Pra-legalisasi: koordinasi & penyiapan dokumen, belum ada persetujuan" },
-            { "id": "10", "unit": "KPKNL Ternate", "kanwil": "Kanwil Suluttenggomalut", "title": "Optimalisasi BMN untuk Ketahanan Pangan dan Kesejahteraan Masyarakat", "mech": "Sewa atau Pinjam Pakai Sederhana", "status": ["none", "none", "none", "none", "none", "none", "none"], "ket": "Legalisasi parsial: persetujuan sewa terbit, perjanjian belum ditandatangani (de facto berjalan)" }
+            { "id": "1", "unit": "KPKNL Pekanbaru", "kanwil": "Kanwil Riau, Sumbar & Kepri", "title": "Pemanfaatan BMN Sebagian Tanah LPP RRI Pekanbaru Untuk Madani Trade Center", "mech": "Sewa atau Pinjam Pakai Sederhana", "status": ["none", "none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", "", ""], "ket": "Implemented: perjanjian sewa ada, pemanfaatan aktif" },
+            { "id": "2", "unit": "KPKNL Padang", "kanwil": "Kanwil Riau, Sumbar & Kepri", "title": "Optimalisasi Sebagian Tanah/Bangunan Pelabuhan Perikanan Samudera Bungus untuk Sentra Tuna Sumbar", "mech": "Sewa atau Pinjam Pakai Sederhana", "status": ["none", "none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", "", ""], "ket": "Implemented (non-komersial): pemanfaatan sosial berjalan dengan dasar perjanjian" },
+            { "id": "3", "unit": "KPKNL Jakarta I", "kanwil": "Kanwil DKI Jakarta", "title": "KSP BMN Berupa Tanah Untuk Pembangunan International Student Housing Pada Universitas Indonesia", "mech": "Sewa atau Pinjam Pakai Sederhana", "status": ["none", "none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", "", ""], "ket": "Pra-legalisasi: konsep optimalisasi & penjajakan mitra" },
+            { "id": "4", "unit": "KPKNL Jakarta II", "kanwil": "Kanwil DKI Jakarta", "title": "EMPOWERING VOICES: Unified, Inclusive, and Empowered Public Services: State Assets for All", "mech": "Sewa atau Pinjam Pakai Sederhana", "status": ["none", "none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", "", ""], "ket": "Konseptual: belum masuk tahap persetujuan formal" },
+            { "id": "5", "unit": "KPKNL Jakarta III", "kanwil": "Kanwil DKI Jakarta", "title": "Kawasan Masjid Istiqlal sebagai Ekosistem Aset Berbasis Spiritual, Edukasi, dan Ekonomi Kreatif", "mech": "Sewa atau Pinjam Pakai Kompleks", "status": ["none", "none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", "", ""], "ket": "Pra-legalisasi: pemetaan & penertiban, belum ada persetujuan/perjanjian" },
+            { "id": "6", "unit": "KPKNL Purwokerto", "kanwil": "Kanwil Jateng & DIY", "title": "Pemanfaatan Farm Manggala Aset BMN Pada Balai Besar Pembibitan Ternak Unggul (Baturraden)", "mech": "Sewa atau Pinjam Pakai Sederhana", "status": ["none", "none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", "", ""], "ket": "Implemented: pemanfaatan berjalan dengan dasar kontraktual" },
+            { "id": "7", "unit": "KPKNL Malang", "kanwil": "Kanwil Jawa Timur", "title": "PETIK ANGGUR-PETIK ILMU BARENG MAS-EE: Optimalisasi Aset Polbangtan Malang", "mech": "Sewa atau Pinjam Pakai Sederhana", "status": ["none", "none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", "", ""], "ket": "Fully implemented: persetujuan sewa terbit, perjanjian ditandatangani, PNBP terealisasi, operasional berjalan" },
+            { "id": "8", "unit": "KPKNL Tarakan", "kanwil": "Kanwil Kaltim & Utara", "title": "Optimalisasi Aset di Luar Kawasan Bandar Udara Juwata Tarakan melalui Lelang Hak Menikmati", "mech": "Sewa atau Pinjam Pakai Kompleks", "status": ["none", "none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", "", ""], "ket": "Pra-implementasi lanjut: penilaian sewa selesai, menunggu persetujuan & lelang" },
+            { "id": "9", "unit": "KPKNL Palopo", "kanwil": "Kanwil Sulsel, Tenggara & Barat", "title": "Optimalisasi BMN Tanah & Bangunan PN Palopo Sebagai Public Value Creation", "mech": "Sewa atau Pinjam Pakai Sederhana", "status": ["none", "none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", "", ""], "ket": "Pra-legalisasi: koordinasi & penyiapan dokumen, belum ada persetujuan" },
+            { "id": "10", "unit": "KPKNL Ternate", "kanwil": "Kanwil Suluttenggomalut", "title": "Optimalisasi BMN untuk Ketahanan Pangan dan Kesejahteraan Masyarakat", "mech": "Sewa atau Pinjam Pakai Sederhana", "status": ["none", "none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", "", ""], "ket": "Legalisasi parsial: persetujuan sewa terbit, perjanjian belum ditandatangani (de facto berjalan)" }
         ];
 
         window.renderTables = function(data) {
@@ -214,19 +240,32 @@
                 `;
 
                 let statusHtml = '';
+                const progArray = item.progress || ["", "", "", "", "", "", ""];
+                
                 item.status.forEach((s, idx) => {
                     let icon = '<i class="fas fa-minus icon-none"></i>';
                     if(s === 'check') icon = '<i class="fas fa-check-circle icon-check"></i>';
                     if(s === 'late') icon = '<i class="fas fa-check-circle icon-late"></i>';
-                    statusHtml += `<td class="status-cell" data-month="${idx}">${icon}</td>`;
+                    
+                    let progText = progArray[idx] || '';
+                    let safeProgText = progText.replace(/"/g, '&quot;');
+                    let textHtml = progText ? `<div class="text-[10px] text-slate-500 mt-2 leading-tight line-clamp-2 px-1 text-left bg-white border border-slate-100 rounded" title="${safeProgText}">${progText}</div>` : '';
+                    
+                    statusHtml += `
+                        <td class="status-cell p-3 align-top" data-month="${idx}" data-progress="${safeProgText}">
+                            <div class="flex flex-col items-center justify-start h-full">
+                                <div>${icon}</div>
+                                ${textHtml}
+                            </div>
+                        </td>`;
                 });
 
                 monitoringBody.innerHTML += `
                     <tr class="hover:bg-slate-50" data-id="${item.id}">
-                        <td class="p-4 text-center text-slate-500">${item.id}</td>
-                        <td class="p-4 font-medium text-slate-800">${item.unit}</td>
+                        <td class="p-4 text-center text-slate-500 align-top">${item.id}</td>
+                        <td class="p-4 font-medium text-slate-800 align-top">${item.unit}</td>
                         ${statusHtml}
-                        <td class="p-4 text-center"><button onclick="window.startEditMonitoring(this, '${item.id}')" class="p-2 text-blue-600 hover:text-blue-800 transition-all"><i class="fas fa-edit"></i></button></td>
+                        <td class="p-4 text-center align-top"><button onclick="window.startEditMonitoring(this, '${item.id}')" class="p-2 text-blue-600 hover:text-blue-800 transition-all"><i class="fas fa-edit"></i></button></td>
                     </tr>
                 `;
             });
@@ -380,16 +419,19 @@
 
             if (isEditing) {
                 const newStatuses = [];
+                const newProgresses = [];
                 cells.forEach(cell => {
                     const sel = cell.querySelector('select');
+                    const txt = cell.querySelector('textarea');
                     newStatuses.push(sel ? sel.value : 'none');
+                    newProgresses.push(txt ? txt.value : '');
                 });
                 
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
                 btn.disabled = true;
                 
                 if (typeof window.saveDataMonitoring === 'function') {
-                    window.saveDataMonitoring(id, newStatuses).catch(() => {
+                    window.saveDataMonitoring(id, newStatuses, newProgresses).catch(() => {
                         btn.innerHTML = '<i class="fas fa-save"></i>';
                         btn.disabled = false;
                         alert("Perubahan gagal disimpan ke server. Data mungkin hanya tersimpan lokal.");
@@ -407,15 +449,20 @@
                     cells.forEach(cell => {
                         const icon = cell.querySelector('i');
                         let val = 'none';
-                        if (icon.classList.contains('icon-check')) val = 'check';
-                        if (icon.classList.contains('icon-late')) val = 'late';
+                        if (icon && icon.classList.contains('icon-check')) val = 'check';
+                        if (icon && icon.classList.contains('icon-late')) val = 'late';
+                        
+                        let curProg = cell.getAttribute('data-progress') || '';
                         
                         cell.innerHTML = `
-                            <select class="status-select">
-                                <option value="check" ${val==='check'?'selected':''}>OK</option>
-                                <option value="late" ${val==='late'?'selected':''}>Late</option>
-                                <option value="none" ${val==='none'?'selected':''}>-</option>
-                            </select>`;
+                            <div class="flex flex-col gap-2">
+                                <select class="status-select">
+                                    <option value="check" ${val==='check'?'selected':''}>OK</option>
+                                    <option value="late" ${val==='late'?'selected':''}>Late</option>
+                                    <option value="none" ${val==='none'?'selected':''}>-</option>
+                                </select>
+                                <textarea class="edit-input progress-input" placeholder="Ket...">${curProg}</textarea>
+                            </div>`;
                     });
                     btn.innerHTML = '<i class="fas fa-save"></i>';
                     btn.dataset.editing = 'true';
@@ -453,8 +500,28 @@
 
         let app, db, auth;
 
+        window.forceOfflineMode = function() {
+            const loader = document.getElementById('db-loading');
+            if (loader) {
+                loader.classList.add('hidden');
+            }
+            window.renderTables(window.initialData);
+        };
+
         async function initFirebase() {
             const syncStatus = document.getElementById('sync-status');
+            const timeout = setTimeout(() => {
+                const loader = document.getElementById('db-loading');
+                if (!loader.classList.contains('hidden')) {
+                    document.getElementById('loading-text').innerText = "Waktu koneksi habis";
+                    document.getElementById('loading-text').classList.add('text-red-600');
+                    document.getElementById('loading-subtext').innerText = "Gagal menghubungi database. Menampilkan data lokal.";
+                    setTimeout(() => {
+                        window.forceOfflineMode();
+                    }, 2000);
+                }
+            }, 5000);
+
             try {
                 app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
@@ -464,10 +531,14 @@
                 
                 const colRef = collection(db, 'teams');
                 onSnapshot(colRef, (snapshot) => {
+                    clearTimeout(timeout);
+                    document.getElementById('db-loading').classList.add('hidden');
+                    
                     const dataList = [];
                     snapshot.forEach(doc => dataList.push(doc.data()));
 
                     if (dataList.length === 0) {
+                        window.renderTables(window.initialData);
                         seedDatabase();
                     } else {
                         dataList.sort((a, b) => parseInt(a.id) - parseInt(b.id));
@@ -477,12 +548,26 @@
                         syncStatus.className = 'px-3 py-1 bg-green-50 text-green-600 text-xs font-medium rounded-full flex items-center gap-2';
                     }
                 }, (error) => {
+                    clearTimeout(timeout);
                     console.error(error);
+                    document.getElementById('loading-text').innerText = "Gagal membaca data";
+                    document.getElementById('loading-text').classList.add('text-red-600');
+                    document.getElementById('loading-subtext').innerText = "Pastikan aturan (Rules) Firestore mengizinkan akses baca/tulis.";
+                    setTimeout(() => {
+                        window.forceOfflineMode();
+                    }, 3000);
                     syncStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Gagal Membaca Data';
                     syncStatus.className = 'px-3 py-1 bg-red-50 text-red-600 text-xs font-medium rounded-full flex items-center gap-2';
                 });
             } catch (error) {
+                clearTimeout(timeout);
                 console.error(error);
+                document.getElementById('loading-text').innerText = "Gagal menghubungkan ke Database";
+                document.getElementById('loading-text').classList.add('text-red-600');
+                document.getElementById('loading-subtext').innerText = "Pastikan database Firestore sudah dibuat di Firebase Console.";
+                setTimeout(() => {
+                    window.forceOfflineMode();
+                }, 3000);
                 syncStatus.innerHTML = '<i class="fas fa-wifi"></i> Mode Luring (Offline)';
                 syncStatus.className = 'px-3 py-1 bg-slate-100 text-slate-600 text-xs font-medium rounded-full flex items-center gap-2';
             }
@@ -494,7 +579,7 @@
                     await setDoc(doc(db, 'teams', item.id), item);
                 }
             } catch(e) {
-                console.error("Gagal menyinkronkan data awal.", e);
+                console.error("Gagal menyinkronkan data awal. Kemungkinan Firestore belum aktif.", e);
             }
         }
 
@@ -503,9 +588,9 @@
             await setDoc(doc(db, 'teams', id), { title: title, mech: mech, ket: ket }, { merge: true });
         };
 
-        window.saveDataMonitoring = async function(id, statusArray) {
+        window.saveDataMonitoring = async function(id, statusArray, progressArray) {
             if(!db) throw new Error("Database offline");
-            await setDoc(doc(db, 'teams', id), { status: statusArray }, { merge: true });
+            await setDoc(doc(db, 'teams', id), { status: statusArray, progress: progressArray }, { merge: true });
         };
 
         initFirebase();
