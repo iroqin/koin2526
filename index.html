@@ -120,6 +120,7 @@
                     <span class="flex items-center gap-1 font-medium text-green-700"><i class="fas fa-check-circle icon-check"></i> OK Ontime</span>
                     <span class="flex items-center gap-1 font-medium text-red-600"><i class="fas fa-check-circle icon-late"></i> OK Late</span>
                     <span class="flex items-center gap-1 font-medium text-slate-400"><i class="fas fa-minus icon-none"></i> Kosong</span>
+                    <span class="flex items-center gap-1 font-medium text-red-500 ml-4"><div class="w-3 h-3 bg-red-100 border border-red-300 rounded"></div> Jatuh Tempo</span>
                 </div>
             </div>
             <div class="flex items-center gap-2 text-slate-600 bg-slate-50 px-3 py-1 rounded-md border border-slate-200">
@@ -135,13 +136,13 @@
                         <tr class="bg-slate-50 text-slate-500 text-xs font-semibold uppercase tracking-wider border-b border-slate-200">
                             <th class="p-4 w-10 text-center">No</th>
                             <th class="p-4 min-w-[180px]">Unit Kerja</th>
-                            <th class="p-4 min-w-[120px] text-center" data-month="0">Jan</th>
-                            <th class="p-4 min-w-[120px] text-center" data-month="1">Feb</th>
-                            <th class="p-4 min-w-[120px] text-center" data-month="2">Mar</th>
-                            <th class="p-4 min-w-[120px] text-center" data-month="3">Apr</th>
-                            <th class="p-4 min-w-[120px] text-center" data-month="4">Mei</th>
-                            <th class="p-4 min-w-[120px] text-center" data-month="5">Jun</th>
-                            <th class="p-4 min-w-[120px] text-center bg-blue-50 text-blue-800">Akhir</th>
+                            <th class="p-4 min-w-[120px] text-center" data-month="0">Jan<br><span class="text-[10px] text-slate-400 font-normal">Batas 10 Feb</span></th>
+                            <th class="p-4 min-w-[120px] text-center" data-month="1">Feb<br><span class="text-[10px] text-slate-400 font-normal">Batas 10 Mar</span></th>
+                            <th class="p-4 min-w-[120px] text-center" data-month="2">Mar<br><span class="text-[10px] text-slate-400 font-normal">Batas 10 Apr</span></th>
+                            <th class="p-4 min-w-[120px] text-center" data-month="3">Apr<br><span class="text-[10px] text-slate-400 font-normal">Batas 10 Mei</span></th>
+                            <th class="p-4 min-w-[120px] text-center" data-month="4">Mei<br><span class="text-[10px] text-slate-400 font-normal">Batas 10 Jun</span></th>
+                            <th class="p-4 min-w-[120px] text-center" data-month="5">Jun<br><span class="text-[10px] text-slate-400 font-normal">Batas 10 Jul</span></th>
+                            <th class="p-4 min-w-[120px] text-center bg-blue-50 text-blue-800">Akhir<br><span class="text-[10px] text-blue-500 font-normal">Batas 10 Ags</span></th>
                             <th class="p-4 w-16 text-center">Aksi</th>
                         </tr>
                     </thead>
@@ -201,6 +202,17 @@
             let onTrackCount = 0;
             let attentionCount = 0;
 
+            const deadlines = [
+                new Date(2026, 1, 11), // Batas Jan: 10 Feb 2026 (< 11 Feb)
+                new Date(2026, 2, 11), // Batas Feb: 10 Mar 2026
+                new Date(2026, 3, 11), // Batas Mar: 10 Apr 2026
+                new Date(2026, 4, 11), // Batas Apr: 10 Mei 2026
+                new Date(2026, 5, 11), // Batas Mei: 10 Jun 2026
+                new Date(2026, 6, 11), // Batas Jun: 10 Jul 2026
+                new Date(2026, 7, 11)  // Batas Akhir: 10 Ags 2026
+            ];
+            const today = new Date();
+
             data.forEach(item => {
                 let filledCount = 0;
                 item.status.forEach(s => { if(s === 'check' || s === 'late') filledCount++; });
@@ -230,15 +242,22 @@
                     if(s === 'check') icon = '<i class="fas fa-check-circle icon-check"></i>';
                     if(s === 'late') icon = '<i class="fas fa-check-circle icon-late"></i>';
                     
+                    let isOverdue = (s === 'none' && today >= deadlines[idx]);
+                    let bgClass = isOverdue ? 'bg-red-50 border border-red-200' : '';
+                    
                     let progText = progArray[idx] || '';
                     let safeProgText = progText.replace(/"/g, '&quot;');
-                    let textHtml = progText ? `<div class="text-[10px] text-slate-600 mt-2 leading-snug px-2 py-1 text-left bg-white border border-slate-200 rounded whitespace-normal break-words w-full shadow-sm">${progText}</div>` : '';
+                    let borderClass = isOverdue ? 'border-red-300' : 'border-slate-200';
+                    let textHtml = progText ? `<div class="text-[10px] text-slate-600 mt-2 leading-snug px-2 py-1 text-left bg-white border ${borderClass} rounded whitespace-normal break-words w-full shadow-sm">${progText}</div>` : '';
+                    
+                    let warningText = isOverdue ? `<div class="text-[10px] text-red-600 mt-1 font-medium bg-red-100 px-1 py-0.5 rounded text-center w-full">Jatuh Tempo</div>` : '';
                     
                     statusHtml += `
-                        <td class="status-cell p-3 align-top" data-month="${idx}" data-progress="${safeProgText}">
-                            <div class="flex flex-col items-center justify-start h-full">
+                        <td class="status-cell p-3 align-top ${bgClass}" data-month="${idx}" data-progress="${safeProgText}">
+                            <div class="flex flex-col items-center justify-start h-full w-full">
                                 <div>${icon}</div>
                                 ${textHtml}
+                                ${warningText}
                             </div>
                         </td>`;
                 });
