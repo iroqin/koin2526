@@ -99,7 +99,8 @@
                             <th class="p-4 w-10 text-center">No</th>
                             <th class="p-4 w-1/5">Unit Kerja</th>
                             <th class="p-4 min-w-[250px]">Judul Project Inovasi</th>
-                            <th class="p-4 w-48 text-center">Mekanisme</th>
+                            <th class="p-4 w-40 text-center">Mekanisme</th>
+                            <th class="p-4 w-40 text-center">Mekanisme Tambahan</th>
                             <th class="p-4 w-40">Kepatuhan (x/7)</th>
                             <th class="p-4 min-w-[150px]">Keterangan</th>
                             <th class="p-4 w-16 text-center">Aksi</th>
@@ -178,16 +179,16 @@
 
         // Data awal termasuk array progress
         window.initialData = [
-            { "id": "1", "unit": "KPKNL Pekanbaru", "kanwil": "Kanwil Riau, Sumbar & Kepri", "title": "Pemanfaatan BMN Sebagian Tanah LPP RRI Pekanbaru Untuk Madani Trade Center", "mech": "Sewa atau Pinjam Pakai Sederhana", "status": ["none", "none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", "", ""], "ket": "Implemented: perjanjian sewa ada, pemanfaatan aktif" },
-            { "id": "2", "unit": "KPKNL Padang", "kanwil": "Kanwil Riau, Sumbar & Kepri", "title": "Optimalisasi Sebagian Tanah/Bangunan Pelabuhan Perikanan Samudera Bungus untuk Sentra Tuna Sumbar", "mech": "Sewa atau Pinjam Pakai Sederhana", "status": ["none", "none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", "", ""], "ket": "Implemented (non-komersial): pemanfaatan sosial berjalan dengan dasar perjanjian" },
-            { "id": "3", "unit": "KPKNL Jakarta I", "kanwil": "Kanwil DKI Jakarta", "title": "KSP BMN Berupa Tanah Untuk Pembangunan International Student Housing Pada Universitas Indonesia", "mech": "Sewa atau Pinjam Pakai Sederhana", "status": ["none", "none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", "", ""], "ket": "Pra-legalisasi: konsep optimalisasi & penjajakan mitra" },
-            { "id": "4", "unit": "KPKNL Jakarta II", "kanwil": "Kanwil DKI Jakarta", "title": "EMPOWERING VOICES: Unified, Inclusive, and Empowered Public Services: State Assets for All", "mech": "Sewa atau Pinjam Pakai Sederhana", "status": ["none", "none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", "", ""], "ket": "Konseptual: belum masuk tahap persetujuan formal" },
-            { "id": "5", "unit": "KPKNL Jakarta III", "kanwil": "Kanwil DKI Jakarta", "title": "Kawasan Masjid Istiqlal sebagai Ekosistem Aset Berbasis Spiritual, Edukasi, dan Ekonomi Kreatif", "mech": "Sewa atau Pinjam Pakai Kompleks", "status": ["none", "none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", "", ""], "ket": "Pra-legalisasi: pemetaan & penertiban, belum ada persetujuan/perjanjian" },
-            { "id": "6", "unit": "KPKNL Purwokerto", "kanwil": "Kanwil Jateng & DIY", "title": "Pemanfaatan Farm Manggala Aset BMN Pada Balai Besar Pembibitan Ternak Unggul (Baturraden)", "mech": "Sewa atau Pinjam Pakai Sederhana", "status": ["none", "none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", "", ""], "ket": "Implemented: pemanfaatan berjalan dengan dasar kontraktual" },
-            { "id": "7", "unit": "KPKNL Malang", "kanwil": "Kanwil Jawa Timur", "title": "PETIK ANGGUR-PETIK ILMU BARENG MAS-EE: Optimalisasi Aset Polbangtan Malang", "mech": "Sewa atau Pinjam Pakai Sederhana", "status": ["none", "none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", "", ""], "ket": "Fully implemented: persetujuan sewa terbit, perjanjian ditandatangani, PNBP terealisasi, operasional berjalan" },
-            { "id": "8", "unit": "KPKNL Tarakan", "kanwil": "Kanwil Kaltim & Utara", "title": "Optimalisasi Aset di Luar Kawasan Bandar Udara Juwata Tarakan melalui Lelang Hak Menikmati", "mech": "Sewa atau Pinjam Pakai Kompleks", "status": ["none", "none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", "", ""], "ket": "Pra-implementasi lanjut: penilaian sewa selesai, menunggu persetujuan & lelang" },
-            { "id": "9", "unit": "KPKNL Palopo", "kanwil": "Kanwil Sulsel, Tenggara & Barat", "title": "Optimalisasi BMN Tanah & Bangunan PN Palopo Sebagai Public Value Creation", "mech": "Sewa atau Pinjam Pakai Sederhana", "status": ["none", "none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", "", ""], "ket": "Pra-legalisasi: koordinasi & penyiapan dokumen, belum ada persetujuan" },
-            { "id": "10", "unit": "KPKNL Ternate", "kanwil": "Kanwil Suluttenggomalut", "title": "Optimalisasi BMN untuk Ketahanan Pangan dan Kesejahteraan Masyarakat", "mech": "Sewa atau Pinjam Pakai Sederhana", "status": ["none", "none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", "", ""], "ket": "Legalisasi parsial: persetujuan sewa terbit, perjanjian belum ditandatangani (de facto berjalan)" }
+            { "id": "1", "unit": "KPKNL Pekanbaru", "kanwil": "Kanwil Riau, Sumbar & Kepri", "title": "Pemanfaatan BMN Sebagian Tanah LPP RRI Pekanbaru Untuk Madani Trade Center", "mech": "", "mechAdd": "", "status": ["none", "none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", "", ""], "ket": "Implemented: perjanjian sewa ada, pemanfaatan aktif" },
+            { "id": "2", "unit": "KPKNL Padang", "kanwil": "Kanwil Riau, Sumbar & Kepri", "title": "Optimalisasi Sebagian Tanah/Bangunan Pelabuhan Perikanan Samudera Bungus untuk Sentra Tuna Sumbar", "mech": "", "mechAdd": "", "status": ["none", "none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", "", ""], "ket": "Implemented (non-komersial): pemanfaatan sosial berjalan dengan dasar perjanjian" },
+            { "id": "3", "unit": "KPKNL Jakarta I", "kanwil": "Kanwil DKI Jakarta", "title": "KSP BMN Berupa Tanah Untuk Pembangunan International Student Housing Pada Universitas Indonesia", "mech": "", "mechAdd": "", "status": ["none", "none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", "", ""], "ket": "Pra-legalisasi: konsep optimalisasi & penjajakan mitra" },
+            { "id": "4", "unit": "KPKNL Jakarta II", "kanwil": "Kanwil DKI Jakarta", "title": "EMPOWERING VOICES: Unified, Inclusive, and Empowered Public Services: State Assets for All", "mech": "", "mechAdd": "", "status": ["none", "none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", "", ""], "ket": "Konseptual: belum masuk tahap persetujuan formal" },
+            { "id": "5", "unit": "KPKNL Jakarta III", "kanwil": "Kanwil DKI Jakarta", "title": "Kawasan Masjid Istiqlal sebagai Ekosistem Aset Berbasis Spiritual, Edukasi, dan Ekonomi Kreatif", "mech": "", "mechAdd": "", "status": ["none", "none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", "", ""], "ket": "Pra-legalisasi: pemetaan & penertiban, belum ada persetujuan/perjanjian" },
+            { "id": "6", "unit": "KPKNL Purwokerto", "kanwil": "Kanwil Jateng & DIY", "title": "Pemanfaatan Farm Manggala Aset BMN Pada Balai Besar Pembibitan Ternak Unggul (Baturraden)", "mech": "", "mechAdd": "", "status": ["none", "none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", "", ""], "ket": "Implemented: pemanfaatan berjalan dengan dasar kontraktual" },
+            { "id": "7", "unit": "KPKNL Malang", "kanwil": "Kanwil Jawa Timur", "title": "PETIK ANGGUR-PETIK ILMU BARENG MAS-EE: Optimalisasi Aset Polbangtan Malang", "mech": "", "mechAdd": "", "status": ["none", "none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", "", ""], "ket": "Fully implemented: persetujuan sewa terbit, perjanjian ditandatangani, PNBP terealisasi, operasional berjalan" },
+            { "id": "8", "unit": "KPKNL Tarakan", "kanwil": "Kanwil Kaltim & Utara", "title": "Optimalisasi Aset di Luar Kawasan Bandar Udara Juwata Tarakan melalui Lelang Hak Menikmati", "mech": "", "mechAdd": "", "status": ["none", "none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", "", ""], "ket": "Pra-implementasi lanjut: penilaian sewa selesai, menunggu persetujuan & lelang" },
+            { "id": "9", "unit": "KPKNL Palopo", "kanwil": "Kanwil Sulsel, Tenggara & Barat", "title": "Optimalisasi BMN Tanah & Bangunan PN Palopo Sebagai Public Value Creation", "mech": "", "mechAdd": "", "status": ["none", "none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", "", ""], "ket": "Pra-legalisasi: koordinasi & penyiapan dokumen, belum ada persetujuan" },
+            { "id": "10", "unit": "KPKNL Ternate", "kanwil": "Kanwil Suluttenggomalut", "title": "Optimalisasi BMN untuk Ketahanan Pangan dan Kesejahteraan Masyarakat", "mech": "", "mechAdd": "", "status": ["none", "none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", "", ""], "ket": "Legalisasi parsial: persetujuan sewa terbit, perjanjian belum ditandatangani (de facto berjalan)" }
         ];
 
         window.renderTables = function(data) {
@@ -238,7 +239,8 @@
                         <td class="p-4 text-center font-bold text-slate-600">${item.id}</td>
                         <td class="p-4 align-top"><span class="kanwil-badge text-slate-400 block mb-1">${item.kanwil}</span><div class="font-bold text-slate-800 text-base">${item.unit}</div></td>
                         <td class="p-4 align-top title-cell"><div class="text-slate-700 leading-relaxed">${item.title}</div></td>
-                        <td class="p-4 align-top text-center mech-cell"><span class="px-2 py-1 rounded-full text-xs font-medium ${badgeStyle}">${item.mech}</span></td>
+                        <td class="p-4 align-top text-center mech-cell"><span class="px-2 py-1 rounded-full text-xs font-medium ${badgeStyle}">${item.mech || '-'}</span></td>
+                        <td class="p-4 align-top text-center mech-add-cell"><span class="px-2 py-1 rounded-full text-xs font-medium bg-slate-50 text-slate-700 border border-slate-200">${item.mechAdd || '-'}</span></td>
                         <td class="p-4 align-middle"><div class="flex items-center gap-2"><div class="flex-1 bg-slate-200 rounded-full h-2"><div class="progress-bar-fill h-2 rounded-full transition-all duration-500 ${percentage === 100 ? 'bg-green-500' : 'bg-blue-600'}" style="width: ${percentage}%"></div></div><span class="progress-text text-xs font-bold text-slate-600 w-8 text-right">${percentage}%</span></div></td>
                         <td class="p-4 align-top ket-cell text-slate-500 italic text-xs">${item.ket || '-'}</td>
                         <td class="p-4 align-top text-center"><button onclick="window.startEditFinalis(this, '${item.id}')" class="p-2 text-blue-600 hover:text-blue-800 transition-all"><i class="fas fa-edit"></i></button></td>
@@ -292,10 +294,12 @@
         };
 
         window.getMechStyle = function(val) {
-            if (val.includes('KSP')) return 'bg-blue-50 text-blue-700 border border-blue-200';
-            if (val.includes('KSPI')) return 'bg-purple-50 text-purple-700 border border-purple-200';
-            if (val.includes('Sewa')) return 'bg-orange-50 text-orange-700 border border-orange-200';
-            if (val.includes('Sederhana')) return 'bg-green-50 text-green-700 border border-green-200';
+            if (!val || val === '-') return 'bg-slate-50 text-slate-700 border border-slate-200';
+            if (val === 'KSP') return 'bg-blue-50 text-blue-700 border border-blue-200';
+            if (val === 'KSPI' || val === 'KETUPI') return 'bg-purple-50 text-purple-700 border border-purple-200';
+            if (val === 'Sewa') return 'bg-orange-50 text-orange-700 border border-orange-200';
+            if (val === 'Pinjam Pakai') return 'bg-green-50 text-green-700 border border-green-200';
+            if (val === 'BGS/BSG') return 'bg-teal-50 text-teal-700 border border-teal-200';
             return 'bg-slate-50 text-slate-700 border border-slate-200';
         };
 
@@ -370,19 +374,21 @@
             const row = btn.closest('tr');
             const titleCell = row.querySelector('.title-cell');
             const mechCell = row.querySelector('.mech-cell');
+            const mechAddCell = row.querySelector('.mech-add-cell');
             const ketCell = row.querySelector('.ket-cell');
             const isEditing = btn.dataset.editing === 'true';
 
             if (isEditing) {
                 const newTitle = titleCell.querySelector('textarea').value;
                 const newMech = mechCell.querySelector('select').value;
+                const newMechAdd = mechAddCell.querySelector('select').value;
                 const newKet = ketCell.querySelector('input').value;
                 
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
                 btn.disabled = true;
                 
                 if (typeof window.saveDataFinalis === 'function') {
-                    window.saveDataFinalis(id, newTitle, newMech, newKet).catch(() => {
+                    window.saveDataFinalis(id, newTitle, newMech, newMechAdd, newKet).catch(() => {
                         btn.innerHTML = '<i class="fas fa-save"></i>';
                         btn.disabled = false;
                         alert("Perubahan gagal disimpan ke server. Data mungkin hanya tersimpan lokal.");
@@ -395,23 +401,39 @@
                     btn.classList.remove('bg-green-100', 'text-green-600');
                     btn.classList.add('text-blue-600', 'hover:bg-blue-50');
                     titleCell.innerHTML = `<div class="text-slate-700 leading-relaxed">${newTitle}</div>`;
-                    mechCell.innerHTML = `<span class="px-2 py-1 rounded-full text-xs font-medium bg-slate-50">${newMech}</span>`;
+                    mechCell.innerHTML = `<span class="px-2 py-1 rounded-full text-xs font-medium bg-slate-50">${newMech || '-'}</span>`;
+                    mechAddCell.innerHTML = `<span class="px-2 py-1 rounded-full text-xs font-medium bg-slate-50">${newMechAdd || '-'}</span>`;
                     ketCell.innerText = newKet || '-';
                 }
             } else {
                 const action = () => {
                     const curTitle = titleCell.innerText.trim();
-                    const curMech = mechCell.innerText.trim();
+                    const curMech = mechCell.innerText.trim() === '-' ? '' : mechCell.innerText.trim();
+                    const curMechAdd = mechAddCell.innerText.trim() === '-' ? '' : mechAddCell.innerText.trim();
                     const curKet = ketCell.innerText.trim() === '-' ? '' : ketCell.innerText.trim();
 
                     titleCell.innerHTML = `<textarea class="edit-input">${curTitle}</textarea>`;
+                    
                     mechCell.innerHTML = `
                         <select class="mech-select">
-                            <option value="KSP/BGS/BSG" ${curMech === 'KSP/BGS/BSG' ? 'selected' : ''}>KSP/BGS/BSG</option>
-                            <option value="KSPI/KETUPI" ${curMech === 'KSPI/KETUPI' ? 'selected' : ''}>KSPI/KETUPI</option>
-                            <option value="Sewa atau Pinjam Pakai Kompleks" ${curMech === 'Sewa atau Pinjam Pakai Kompleks' ? 'selected' : ''}>Sewa/Pinjam Kompleks</option>
-                            <option value="Sewa atau Pinjam Pakai Sederhana" ${curMech === 'Sewa atau Pinjam Pakai Sederhana' ? 'selected' : ''}>Sewa/Pinjam Sederhana</option>
+                            <option value="" ${curMech === '' ? 'selected' : ''}>-</option>
+                            <option value="Sewa" ${curMech === 'Sewa' ? 'selected' : ''}>Sewa</option>
+                            <option value="Pinjam Pakai" ${curMech === 'Pinjam Pakai' ? 'selected' : ''}>Pinjam Pakai</option>
+                            <option value="KSP" ${curMech === 'KSP' ? 'selected' : ''}>KSP</option>
+                            <option value="BGS/BSG" ${curMech === 'BGS/BSG' ? 'selected' : ''}>BGS/BSG</option>
+                            <option value="KSPI" ${curMech === 'KSPI' ? 'selected' : ''}>KSPI</option>
+                            <option value="KETUPI" ${curMech === 'KETUPI' ? 'selected' : ''}>KETUPI</option>
                         </select>`;
+                        
+                    mechAddCell.innerHTML = `
+                        <select class="mech-select">
+                            <option value="" ${curMechAdd === '' ? 'selected' : ''}>-</option>
+                            <option value="Reguler" ${curMechAdd === 'Reguler' ? 'selected' : ''}>Reguler</option>
+                            <option value="BMN pada Pengelola" ${curMechAdd === 'BMN pada Pengelola' ? 'selected' : ''}>BMN pada Pengelola</option>
+                            <option value="BMN pada Kemenkeu" ${curMechAdd === 'BMN pada Kemenkeu' ? 'selected' : ''}>BMN pada Kemenkeu</option>
+                            <option value="Lelang Hak Menikmati" ${curMechAdd === 'Lelang Hak Menikmati' ? 'selected' : ''}>Lelang Hak Menikmati</option>
+                        </select>`;
+
                     ketCell.innerHTML = `<input type="text" class="edit-input" value="${curKet}">`;
 
                     btn.innerHTML = '<i class="fas fa-save"></i>';
@@ -561,9 +583,9 @@
             }
         }
 
-        window.saveDataFinalis = async function(id, title, mech, ket) {
+        window.saveDataFinalis = async function(id, title, mech, mechAdd, ket) {
             if(!db) throw new Error("Database offline");
-            await setDoc(doc(db, 'teams', id), { title: title, mech: mech, ket: ket }, { merge: true });
+            await setDoc(doc(db, 'teams', id), { title: title, mech: mech, mechAdd: mechAdd, ket: ket }, { merge: true });
         };
 
         window.saveDataMonitoring = async function(id, statusArray, progressArray) {
