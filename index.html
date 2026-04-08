@@ -50,6 +50,7 @@
             <span id="loading-text" class="text-lg text-slate-800 block">Menghubungkan ke Database...</span>
             <span id="loading-subtext" class="text-sm text-slate-500 font-normal mt-1 block">Mohon tunggu...</span>
         </div>
+        <button onclick="document.getElementById('db-loading').classList.add('hidden')" class="mt-4 px-4 py-2 bg-slate-200 text-slate-700 rounded text-sm hover:bg-slate-300 font-medium">Lewati Pemuatan</button>
     </div>
 
     <!-- Header Section -->
@@ -359,6 +360,17 @@
 
     <!-- UI Logic Script -->
     <script>
+        // --- FALLBACK KEAMANAN ---
+        // Jika modul skrip di atas gagal dieksekusi sama sekali, ini akan menghapus layar pemuatan setelah 10 detik.
+        setTimeout(function() {
+            const loader = document.getElementById('db-loading');
+            if (loader && !loader.classList.contains('hidden')) {
+                loader.classList.add('hidden');
+                console.warn("Layar pemuatan ditutup paksa karena batas waktu.");
+                renderTables(initialData); // Asumsi renderTables sudah dapat diakses
+            }
+        }, 10000);
+
         window.updateDate = function() {
             const now = new Date();
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
@@ -442,6 +454,10 @@
                 
                 window.saveDataFinalis(id, newTitle, newMech, newKet).then(() => {
                     // UI will automatically reset when Firebase triggers onSnapshot
+                }).catch(() => {
+                    btn.innerHTML = '<i class="fas fa-save"></i>';
+                    btn.disabled = false;
+                    alert("Perubahan gagal disimpan. Data Anda akan disetel ulang secara otomatis.");
                 });
             } else {
                 const action = () => {
@@ -488,6 +504,10 @@
                 
                 window.saveDataMonitoring(id, newStatuses).then(() => {
                     // UI will automatically reset when Firebase triggers onSnapshot
+                }).catch(() => {
+                    btn.innerHTML = '<i class="fas fa-save"></i>';
+                    btn.disabled = false;
+                    alert("Perubahan gagal disimpan. Data Anda akan disetel ulang secara otomatis.");
                 });
             } else {
                 const action = () => {
