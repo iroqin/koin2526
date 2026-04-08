@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoring KOIN MAS 2025/2026</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts & Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .kanwil-badge { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        .table-container::-webkit-scrollbar { height: 6px; }
+        .table-container::-webkit-scrollbar-track { background: #f1f1f1; }
+        .table-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        
+        .status-cell { text-align: center; vertical-align: middle; position: relative; }
+        .icon-check { color: #10b981; } 
+        .icon-late { color: #ef4444; } 
+        .icon-none { color: #cbd5e1; } 
+        
+        .current-month { background-color: #e2e8f0 !important; border-left: 2px solid #1e293b; border-right: 2px solid #1e293b; }
+        th.current-month { border-top: 2px solid #1e293b; color: #1e293b; font-weight: 800; }
+        tr:last-child td.current-month { border-bottom: 2px solid #1e293b; }
+
+        select.status-select, select.mech-select {
+            -webkit-appearance: none; appearance: none; width: 100%; text-align: center; background-color: rgba(255,255,255,0.9);
+            border: 1px solid #3b82f6; border-radius: 4px; padding: 4px; font-size: 0.75rem; cursor: pointer; color: #1e293b; font-weight: 500;
+        }
+        select.status-select:focus, select.mech-select:focus, .edit-input:focus { outline: 2px solid #2563eb; }
+        .edit-input { width: 100%; padding: 4px 8px; border: 1px solid #3b82f6; border-radius: 4px; font-size: 0.875rem; background-color: white; }
+        textarea.edit-input { resize: vertical; min-height: 60px; }
+        
+        #db-loading {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.95); z-index: 100;
+            display: flex; justify-content: center; align-items: center;
+            font-weight: bold; color: #3b82f6; flex-direction: column; gap: 15px; text-align: center; padding: 20px;
+        }
+    </style>
+</head>
+<body class="p-2 md:p-6 text-slate-800">
+
+    <!-- Loading Indicator -->
+    <div id="db-loading">
+        <i class="fas fa-circle-notch fa-spin text-4xl text-blue-600"></i>
+        <div>
+            <span id="loading-text" class="text-lg text-slate-800 block">Menghubungkan ke Database...</span>
+            <span id="loading-subtext" class="text-sm text-slate-500 font-normal mt-1 block">Mohon tunggu...</span>
+        </div>
+    </div>
+
+    <!-- Header Section -->
+    <div class="mb-6 bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-900 tracking-tight">KOIN MAS DJKN <span class="text-blue-600">2025/2026</span></h1>
+            <p class="text-slate-500 text-sm mt-1">Kompetisi Inovasi Manajer Aset</p>
+        </div>
+        <div class="mt-4 md:mt-0 flex gap-2">
+            <button id="masterEditBtn" onclick="toggleMasterEdit()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all flex items-center gap-2 text-sm font-medium shadow-md">
+                <i class="fas fa-lock"></i> Mode Admin
+            </button>
+        </div>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="flex gap-1 mb-6 border-b border-slate-200 overflow-x-auto">
+        <button onclick="switchTab('finalis')" id="btn-finalis" class="px-4 py-2 text-sm font-medium text-blue-600 border-b-2 border-blue-600 focus:outline-none transition-colors whitespace-nowrap">
+            <i class="fas fa-chart-line mr-2"></i>Data Finalis
+        </button>
+        <button onclick="switchTab('laporan')" id="btn-laporan" class="px-4 py-2 text-sm font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-700 hover:border-slate-300 focus:outline-none transition-colors whitespace-nowrap">
+            <i class="fas fa-file-contract mr-2"></i>Monitoring Laporan 2026
+        </button>
+    </div>
+
+    <!-- TAB 1: DATA FINALIS -->
+    <div id="view-finalis" class="tab-content">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-100 border-l-4 border-l-blue-500">
+                <span class="text-xs text-slate-500">Total Finalis</span>
+                <div class="text-2xl font-bold text-slate-800">10</div>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-100 border-l-4 border-l-green-500">
+                <span class="text-xs text-slate-500">On Track</span>
+                <div class="text-2xl font-bold text-green-600" id="stat-ontrack">0</div>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-100 border-l-4 border-l-yellow-500">
+                <span class="text-xs text-slate-500">Perlu Atensi</span>
+                <div class="text-2xl font-bold text-yellow-600" id="stat-atensi">0</div>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-100 border-l-4 border-l-purple-500">
+                <span class="text-xs text-slate-500">Kepatuhan Avg</span>
+                <div class="text-2xl font-bold text-purple-600" id="avg-compliance">0%</div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="table-container overflow-x-auto">
+                <table class="w-full text-left border-collapse whitespace-nowrap md:whitespace-normal" id="table-finalis">
+                    <thead>
+                        <tr class="bg-slate-50 text-slate-500 text-xs font-semibold uppercase tracking-wider border-b border-slate-200">
+                            <th class="p-4 w-10 text-center">No</th>
+                            <th class="p-4 w-1/5">Unit Kerja</th>
+                            <th class="p-4 min-w-[250px]">Judul Project Inovasi</th>
+                            <th class="p-4 w-48 text-center">Mekanisme</th>
+                            <th class="p-4 w-40">Kepatuhan (x/7)</th>
+                            <th class="p-4 min-w-[150px]">Keterangan</th>
+                            <th class="p-4 w-16 text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm divide-y divide-slate-100" id="finalis-body">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 2: MONITORING -->
+    <div id="view-laporan" class="tab-content hidden">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 bg-white p-4 rounded-lg border border-slate-200 shadow-sm">
+            <div class="flex flex-wrap gap-4 items-center mb-2 md:mb-0">
+                <div class="flex items-center gap-2 text-sm text-slate-600">
+                    <span class="flex items-center gap-1 font-medium text-green-700"><i class="fas fa-check-circle icon-check"></i> OK Ontime</span>
+                    <span class="flex items-center gap-1 font-medium text-red-600"><i class="fas fa-check-circle icon-late"></i> OK Late</span>
+                    <span class="flex items-center gap-1 font-medium text-slate-400"><i class="fas fa-minus icon-none"></i> Kosong</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 text-slate-600 bg-slate-50 px-3 py-1 rounded-md border border-slate-200">
+                <i class="far fa-calendar-alt text-blue-600"></i>
+                <span id="currentDateDisplay" class="text-sm font-semibold">...</span>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="table-container overflow-x-auto">
+                <table class="w-full text-left border-collapse whitespace-nowrap" id="table-monitoring">
+                    <thead>
+                        <tr class="bg-slate-50 text-slate-500 text-xs font-semibold uppercase tracking-wider border-b border-slate-200">
+                            <th class="p-4 w-10 text-center">No</th>
+                            <th class="p-4 min-w-[200px]">Unit Kerja</th>
+                            <th class="p-4 w-16 text-center" data-month="0">Jan</th>
+                            <th class="p-4 w-16 text-center" data-month="1">Feb</th>
+                            <th class="p-4 w-16 text-center" data-month="2">Mar</th>
+                            <th class="p-4 w-16 text-center" data-month="3">Apr</th>
+                            <th class="p-4 w-16 text-center" data-month="4">Mei</th>
+                            <th class="p-4 w-16 text-center" data-month="5">Jun</th>
+                            <th class="p-4 w-24 text-center bg-blue-50 text-blue-800">Akhir</th>
+                            <th class="p-4 w-16 text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm divide-y divide-slate-100" id="monitoring-body">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- AUTH MODAL -->
+    <div id="authModal" class="fixed inset-0 bg-slate-900 bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-80">
+            <h3 class="text-lg font-bold mb-4 text-slate-800 flex items-center gap-2"><i class="fas fa-lock text-blue-600"></i> Keamanan</h3>
+            <p class="text-sm text-slate-600 mb-2">Masukkan password admin:</p>
+            <input type="password" id="modalPasswordInput" class="w-full border border-slate-300 rounded px-3 py-2 mb-1" onkeydown="if(event.key === 'Enter') confirmAuth()">
+            <div id="modalError" class="text-red-500 text-xs mb-4 min-h-[1rem] hidden font-medium">Password salah!</div>
+            <div class="flex justify-end gap-2">
+                <button onclick="closeAuthModal()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded">Batal</button>
+                <button onclick="confirmAuth()" class="px-4 py-2 text-sm bg-blue-600 text-white hover:bg-blue-700 rounded">OK</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="mt-8 text-center text-xs text-slate-400 pb-4">
+        Dashboard Realtime KOIN MAS 2025/2026 &copy; Direktorat Jenderal Kekayaan Negara
+    </div>
+
+    <!-- FIREBASE & LOGIC SCRIPT -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAVYV9Lfq6dED5g7BUy126uLLbUfmmLHZc",
+            authDomain: "koin-mas-djkn.firebaseapp.com",
+            projectId: "koin-mas-djkn",
+            storageBucket: "koin-mas-djkn.firebasestorage.app",
+            messagingSenderId: "797951705964",
+            appId: "1:797951705964:web:5e1788ba295f186a636949",
+            measurementId: "G-9312RXQ87C"
+        };
+
+        const initialData = [
+            { "id": "1", "unit": "KPKNL Pekanbaru", "kanwil": "Kanwil Riau, Sumbar & Kepri", "title": "Pemanfaatan BMN Sebagian Tanah LPP RRI Pekanbaru Untuk Madani Trade Center", "mech": "Sewa atau Pinjam Pakai Sederhana", "status": ["none", "none", "none", "none", "none", "none", "none"], "ket": "Implemented: perjanjian sewa ada, pemanfaatan aktif" },
+            { "id": "2", "unit": "KPKNL Padang", "kanwil": "Kanwil Riau, Sumbar & Kepri", "title": "Optimalisasi Sebagian Tanah/Bangunan Pelabuhan Perikanan Samudera Bungus untuk Sentra Tuna Sumbar", "mech": "Sewa atau Pinjam Pakai Sederhana", "status": ["none", "none", "none", "none", "none", "none", "none"], "ket": "Implemented (non-komersial): pemanfaatan sosial berjalan dengan dasar perjanjian" },
+            { "id": "3", "unit": "KPKNL Jakarta I", "kanwil": "Kanwil DKI Jakarta", "title": "KSP BMN Berupa Tanah Untuk Pembangunan International Student Housing Pada Universitas Indonesia", "mech": "Sewa atau Pinjam Pakai Sederhana", "status": ["none", "none", "none", "none", "none", "none", "none"], "ket": "Pra-legalisasi: konsep optimalisasi & penjajakan mitra" },
+            { "id": "4", "unit": "KPKNL Jakarta II", "kanwil": "Kanwil DKI Jakarta", "title": "EMPOWERING VOICES: Unified, Inclusive, and Empowered Public Services: State Assets for All", "mech": "Sewa atau Pinjam Pakai Sederhana", "status": ["none", "none", "none", "none", "none", "none", "none"], "ket": "Konseptual: belum masuk tahap persetujuan formal" },
+            { "id": "5", "unit": "KPKNL Jakarta III", "kanwil": "Kanwil DKI Jakarta", "title": "Kawasan Masjid Istiqlal sebagai Ekosistem Aset Berbasis Spiritual, Edukasi, dan Ekonomi Kreatif", "mech": "Sewa atau Pinjam Pakai Kompleks", "status": ["none", "none", "none", "none", "none", "none", "none"], "ket": "Pra-legalisasi: pemetaan & penertiban, belum ada persetujuan/perjanjian" },
+            { "id": "6", "unit": "KPKNL Purwokerto", "kanwil": "Kanwil Jateng & DIY", "title": "Pemanfaatan Farm Manggala Aset BMN Pada Balai Besar Pembibitan Ternak Unggul (Baturraden)", "mech": "Sewa atau Pinjam Pakai Sederhana", "status": ["none", "none", "none", "none", "none", "none", "none"], "ket": "Implemented: pemanfaatan berjalan dengan dasar kontraktual" },
+            { "id": "7", "unit": "KPKNL Malang", "kanwil": "Kanwil Jawa Timur", "title": "PETIK ANGGUR-PETIK ILMU BARENG MAS-EE: Optimalisasi Aset Polbangtan Malang", "mech": "Sewa atau Pinjam Pakai Sederhana", "status": ["none", "none", "none", "none", "none", "none", "none"], "ket": "Fully implemented: persetujuan sewa terbit, perjanjian ditandatangani, PNBP terealisasi, operasional berjalan" },
+            { "id": "8", "unit": "KPKNL Tarakan", "kanwil": "Kanwil Kaltim & Utara", "title": "Optimalisasi Aset di Luar Kawasan Bandar Udara Juwata Tarakan melalui Lelang Hak Menikmati", "mech": "Sewa atau Pinjam Pakai Kompleks", "status": ["none", "none", "none", "none", "none", "none", "none"], "ket": "Pra-implementasi lanjut: penilaian sewa selesai, menunggu persetujuan & lelang" },
+            { "id": "9", "unit": "KPKNL Palopo", "kanwil": "Kanwil Sulsel, Tenggara & Barat", "title": "Optimalisasi BMN Tanah & Bangunan PN Palopo Sebagai Public Value Creation", "mech": "Sewa atau Pinjam Pakai Sederhana", "status": ["none", "none", "none", "none", "none", "none", "none"], "ket": "Pra-legalisasi: koordinasi & penyiapan dokumen, belum ada persetujuan" },
+            { "id": "10", "unit": "KPKNL Ternate", "kanwil": "Kanwil Suluttenggomalut", "title": "Optimalisasi BMN untuk Ketahanan Pangan dan Kesejahteraan Masyarakat", "mech": "Sewa atau Pinjam Pakai Sederhana", "status": ["none", "none", "none", "none", "none", "none", "none"], "ket": "Legalisasi parsial: persetujuan sewa terbit, perjanjian belum ditandatangani (de facto berjalan)" }
+        ];
+
+        let app, db, auth;
+        window.isMasterEditMode = false;
+
+        async function init() {
+            try {
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                await signInAnonymously(auth);
+                document.getElementById('db-loading').classList.add('hidden');
+                
+                const colRef = collection(db, 'teams');
+                onSnapshot(colRef, (snapshot) => {
+                    const dataList = [];
+                    snapshot.forEach(doc => dataList.push(doc.data()));
+
+                    if (dataList.length === 0) {
+                        seedDatabase();
+                    } else {
+                        dataList.sort((a, b) => parseInt(a.id) - parseInt(b.id));
+                        renderTables(dataList);
+                    }
+                });
+            } catch (error) {
+                console.error(error);
+                document.getElementById('loading-text').innerText = "Gagal menghubungkan ke Database";
+                document.getElementById('loading-text').classList.add('text-red-600');
+                document.getElementById('loading-subtext').innerText = "Pastikan domain GitHub Pages Anda sudah ditambahkan di Firebase Console (Authentication > Settings > Authorized domains).";
+            }
+        }
+
+        async function seedDatabase() {
+            for (const item of initialData) {
+                await setDoc(doc(db, 'teams', item.id), item);
+            }
+        }
+
+        function renderTables(data) {
+            const finalisBody = document.getElementById('finalis-body');
+            const monitoringBody = document.getElementById('monitoring-body');
+            finalisBody.innerHTML = '';
+            monitoringBody.innerHTML = '';
+
+            let totalCompliance = 0;
+            let onTrackCount = 0;
+            let attentionCount = 0;
+
+            data.forEach(item => {
+                let filledCount = 0;
+                item.status.forEach(s => { if(s === 'check' || s === 'late') filledCount++; });
+                const percentage = Math.round((filledCount / 7) * 100);
+                totalCompliance += percentage;
+                
+                if (percentage >= 50) onTrackCount++; else attentionCount++;
+
+                // Tab Finalis
+                const badgeStyle = getMechStyle(item.mech);
+                finalisBody.innerHTML += `
+                    <tr class="hover:bg-blue-50 transition-colors" data-id="${item.id}">
+                        <td class="p-4 text-center font-bold text-slate-600">${item.id}</td>
+                        <td class="p-4 align-top"><span class="kanwil-badge text-slate-400 block mb-1">${item.kanwil}</span><div class="font-bold text-slate-800 text-base">${item.unit}</div></td>
+                        <td class="p-4 align-top title-cell"><div class="text-slate-700 leading-relaxed">${item.title}</div></td>
+                        <td class="p-4 align-top text-center mech-cell"><span class="px-2 py-1 rounded-full text-xs font-medium ${badgeStyle}">${item.mech}</span></td>
+                        <td class="p-4 align-middle"><div class="flex items-center gap-2"><div class="flex-1 bg-slate-200 rounded-full h-2"><div class="progress-bar-fill h-2 rounded-full transition-all duration-500 ${percentage === 100 ? 'bg-green-500' : 'bg-blue-600'}" style="width: ${percentage}%"></div></div><span class="progress-text text-xs font-bold text-slate-600 w-8 text-right">${percentage}%</span></div></td>
+                        <td class="p-4 align-top ket-cell text-slate-500 italic text-xs">${item.ket || '-'}</td>
+                        <td class="p-4 align-top text-center"><button onclick="window.startEditFinalis(this, '${item.id}')" class="p-2 text-blue-600 hover:text-blue-800 transition-all"><i class="fas fa-edit"></i></button></td>
+                    </tr>
+                `;
+
+                // Tab Monitoring
+                let statusHtml = '';
+                item.status.forEach((s, idx) => {
+                    let icon = '<i class="fas fa-minus icon-none"></i>';
+                    if(s === 'check') icon = '<i class="fas fa-check-circle icon-check"></i>';
+                    if(s === 'late') icon = '<i class="fas fa-check-circle icon-late"></i>';
+                    statusHtml += `<td class="status-cell" data-month="${idx}">${icon}</td>`;
+                });
+
+                monitoringBody.innerHTML += `
+                    <tr class="hover:bg-slate-50" data-id="${item.id}">
+                        <td class="p-4 text-center text-slate-500">${item.id}</td>
+                        <td class="p-4 font-medium text-slate-800">${item.unit}</td>
+                        ${statusHtml}
+                        <td class="p-4 text-center"><button onclick="window.startEditMonitoring(this, '${item.id}')" class="p-2 text-blue-600 hover:text-blue-800 transition-all"><i class="fas fa-edit"></i></button></td>
+                    </tr>
+                `;
+            });
+
+            if (data.length > 0) {
+                document.getElementById('avg-compliance').innerText = `${Math.round(totalCompliance / data.length)}%`;
+                document.getElementById('stat-ontrack').innerText = onTrackCount;
+                document.getElementById('stat-atensi').innerText = attentionCount;
+            }
+            window.highlightCurrentMonth();
+        }
+
+        function getMechStyle(val) {
+            if (val.includes('KSP')) return 'bg-blue-50 text-blue-700 border border-blue-200';
+            if (val.includes('KSPI')) return 'bg-purple-50 text-purple-700 border border-purple-200';
+            if (val.includes('Sewa')) return 'bg-orange-50 text-orange-700 border border-orange-200';
+            if (val.includes('Sederhana')) return 'bg-green-50 text-green-700 border border-green-200';
+            return 'bg-slate-50 text-slate-700 border border-slate-200';
+        }
+
+        // Save Functions
+        window.saveDataFinalis = async function(id, title, mech, ket) {
+            await setDoc(doc(db, 'teams', id), { title: title, mech: mech, ket: ket }, { merge: true });
+        }
+
+        window.saveDataMonitoring = async function(id, statusArray) {
+            await setDoc(doc(db, 'teams', id), { status: statusArray }, { merge: true });
+        }
+
+        init();
+    </script>
+
+    <!-- UI Logic Script -->
+    <script>
+        window.updateDate = function() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('currentDateDisplay').textContent = now.toLocaleDateString('id-ID', options);
+        }
+
+        window.highlightCurrentMonth = function() {
+            const now = new Date();
+            const currentMonth = now.getMonth();
+            if (currentMonth >= 0 && currentMonth <= 5) {
+                document.querySelectorAll(`[data-month="${currentMonth}"]`).forEach(el => el.classList.add('current-month'));
+            }
+        }
+
+        window.switchTab = function(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById('view-' + tabName).classList.remove('hidden');
+            const btnFinalis = document.getElementById('btn-finalis');
+            const btnLaporan = document.getElementById('btn-laporan');
+            if (tabName === 'finalis') {
+                btnFinalis.className = "px-4 py-2 text-sm font-medium text-blue-600 border-b-2 border-blue-600 focus:outline-none";
+                btnLaporan.className = "px-4 py-2 text-sm font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-700";
+            } else {
+                btnLaporan.className = "px-4 py-2 text-sm font-medium text-blue-600 border-b-2 border-blue-600 focus:outline-none";
+                btnFinalis.className = "px-4 py-2 text-sm font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-700";
+            }
+        }
+
+        // Auth Logic
+        let pendingCallback = null;
+        window.showAuthModal = function(callback) {
+            pendingCallback = callback;
+            document.getElementById('modalError').classList.add('hidden');
+            document.getElementById('modalPasswordInput').value = '';
+            document.getElementById('authModal').classList.remove('hidden');
+            setTimeout(() => document.getElementById('modalPasswordInput').focus(), 100);
+        }
+        window.closeAuthModal = function() { document.getElementById('authModal').classList.add('hidden'); pendingCallback = null; }
+        window.confirmAuth = function() {
+            if (document.getElementById('modalPasswordInput').value === 'tpokn') {
+                document.getElementById('authModal').classList.add('hidden');
+                if (pendingCallback) pendingCallback();
+                pendingCallback = null;
+            } else {
+                document.getElementById('modalError').classList.remove('hidden');
+            }
+        }
+
+        window.toggleMasterEdit = function() {
+            if (window.isMasterEditMode) {
+                window.isMasterEditMode = false;
+                const btn = document.getElementById('masterEditBtn');
+                btn.innerHTML = '<i class="fas fa-lock"></i> Mode Admin';
+                btn.className = 'bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all flex items-center gap-2 text-sm font-medium shadow-md';
+            } else {
+                showAuthModal(() => {
+                    window.isMasterEditMode = true;
+                    const btn = document.getElementById('masterEditBtn');
+                    btn.innerHTML = '<i class="fas fa-unlock"></i> Keluar Admin';
+                    btn.className = 'bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-all flex items-center gap-2 text-sm font-medium shadow-md';
+                });
+            }
+        }
+
+        // Edit Finalis
+        window.startEditFinalis = function(btn, id) {
+            const row = btn.closest('tr');
+            const titleCell = row.querySelector('.title-cell');
+            const mechCell = row.querySelector('.mech-cell');
+            const ketCell = row.querySelector('.ket-cell');
+            const isEditing = btn.dataset.editing === 'true';
+
+            if (isEditing) {
+                const newTitle = titleCell.querySelector('textarea').value;
+                const newMech = mechCell.querySelector('select').value;
+                const newKet = ketCell.querySelector('input').value;
+                
+                // Disable button during save
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                btn.disabled = true;
+                
+                window.saveDataFinalis(id, newTitle, newMech, newKet).then(() => {
+                    // UI will automatically reset when Firebase triggers onSnapshot
+                });
+            } else {
+                const action = () => {
+                    const curTitle = titleCell.innerText.trim();
+                    const curMech = mechCell.innerText.trim();
+                    const curKet = ketCell.innerText.trim() === '-' ? '' : ketCell.innerText.trim();
+
+                    titleCell.innerHTML = `<textarea class="edit-input">${curTitle}</textarea>`;
+                    mechCell.innerHTML = `
+                        <select class="mech-select">
+                            <option value="KSP/BGS/BSG" ${curMech === 'KSP/BGS/BSG' ? 'selected' : ''}>KSP/BGS/BSG</option>
+                            <option value="KSPI/KETUPI" ${curMech === 'KSPI/KETUPI' ? 'selected' : ''}>KSPI/KETUPI</option>
+                            <option value="Sewa atau Pinjam Pakai Kompleks" ${curMech === 'Sewa atau Pinjam Pakai Kompleks' ? 'selected' : ''}>Sewa/Pinjam Kompleks</option>
+                            <option value="Sewa atau Pinjam Pakai Sederhana" ${curMech === 'Sewa atau Pinjam Pakai Sederhana' ? 'selected' : ''}>Sewa/Pinjam Sederhana</option>
+                        </select>`;
+                    ketCell.innerHTML = `<input type="text" class="edit-input" value="${curKet}">`;
+
+                    btn.innerHTML = '<i class="fas fa-save"></i>';
+                    btn.dataset.editing = 'true';
+                    btn.classList.remove('text-blue-600', 'hover:bg-blue-50');
+                    btn.classList.add('bg-green-100', 'text-green-600');
+                    row.classList.add('bg-yellow-50');
+                };
+
+                if (window.isMasterEditMode) action(); else showAuthModal(action);
+            }
+        }
+
+        // Edit Monitoring
+        window.startEditMonitoring = function(btn, id) {
+            const row = btn.closest('tr');
+            const cells = row.querySelectorAll('.status-cell');
+            const isEditing = btn.dataset.editing === 'true';
+
+            if (isEditing) {
+                const newStatuses = [];
+                cells.forEach(cell => {
+                    const sel = cell.querySelector('select');
+                    newStatuses.push(sel ? sel.value : 'none');
+                });
+                
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                btn.disabled = true;
+                
+                window.saveDataMonitoring(id, newStatuses).then(() => {
+                    // UI will automatically reset when Firebase triggers onSnapshot
+                });
+            } else {
+                const action = () => {
+                    cells.forEach(cell => {
+                        const icon = cell.querySelector('i');
+                        let val = 'none';
+                        if (icon.classList.contains('icon-check')) val = 'check';
+                        if (icon.classList.contains('icon-late')) val = 'late';
+                        
+                        cell.innerHTML = `
+                            <select class="status-select">
+                                <option value="check" ${val==='check'?'selected':''}>OK</option>
+                                <option value="late" ${val==='late'?'selected':''}>Late</option>
+                                <option value="none" ${val==='none'?'selected':''}>-</option>
+                            </select>`;
+                    });
+                    btn.innerHTML = '<i class="fas fa-save"></i>';
+                    btn.dataset.editing = 'true';
+                    btn.classList.remove('text-blue-600', 'hover:bg-blue-50');
+                    btn.classList.add('bg-green-100', 'text-green-600');
+                    row.classList.add('bg-yellow-50');
+                };
+
+                if (window.isMasterEditMode) action(); else showAuthModal(action);
+            }
+        }
+
+        window.onload = function() {
+            updateDate();
+        }
+    </script>
+</body>
+</html>
