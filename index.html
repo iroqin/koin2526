@@ -237,6 +237,8 @@
                     snapshot.forEach(doc => dataList.push(doc.data()));
 
                     if (dataList.length === 0) {
+                        // Menampilkan data awal segera, kemudian memulai proses sinkronisasi ke Firebase
+                        renderTables(initialData);
                         seedDatabase();
                     } else {
                         dataList.sort((a, b) => parseInt(a.id) - parseInt(b.id));
@@ -258,7 +260,7 @@
                 console.error(error);
                 document.getElementById('loading-text').innerText = "Gagal menghubungkan ke Database";
                 document.getElementById('loading-text').classList.add('text-red-600');
-                document.getElementById('loading-subtext').innerText = "Pastikan domain GitHub Pages Anda sudah ditambahkan di Firebase Console (Authentication > Settings > Authorized domains).";
+                document.getElementById('loading-subtext').innerText = "Pastikan database Firestore sudah dibuat di Firebase Console.";
                 setTimeout(() => {
                     document.getElementById('db-loading').classList.add('hidden');
                     renderTables(initialData);
@@ -267,8 +269,12 @@
         }
 
         async function seedDatabase() {
-            for (const item of initialData) {
-                await setDoc(doc(db, 'teams', item.id), item);
+            try {
+                for (const item of initialData) {
+                    await setDoc(doc(db, 'teams', item.id), item);
+                }
+            } catch(e) {
+                console.error("Gagal menyinkronkan data awal. Kemungkinan Firestore belum aktif.", e);
             }
         }
 
