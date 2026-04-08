@@ -93,7 +93,7 @@
 
         <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
             <div class="table-container overflow-x-auto">
-                <table class="w-full text-left border-collapse whitespace-nowrap md:whitespace-normal" id="table-monitoring">
+                <table class="w-full text-left border-collapse whitespace-nowrap md:whitespace-normal" id="table-monitoring-finalis">
                     <thead>
                         <tr class="bg-slate-50 text-slate-500 text-xs font-semibold uppercase tracking-wider border-b border-slate-200">
                             <th class="p-4 w-10 text-center">No</th>
@@ -131,7 +131,7 @@
 
         <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
             <div class="table-container overflow-x-auto">
-                <table class="w-full text-left border-collapse whitespace-nowrap" id="table-monitoring">
+                <table class="w-full text-left border-collapse whitespace-nowrap" id="table-monitoring-laporan">
                     <thead>
                         <tr class="bg-slate-50 text-slate-500 text-xs font-semibold uppercase tracking-wider border-b border-slate-200">
                             <th class="p-4 w-10 text-center">No</th>
@@ -215,11 +215,22 @@
 
             data.forEach(item => {
                 let filledCount = 0;
-                item.status.forEach(s => { if(s === 'check' || s === 'late') filledCount++; });
+                let teamNeedsAttention = false;
+
+                item.status.forEach((s, idx) => {
+                    if(s === 'check' || s === 'late') filledCount++;
+                    let isOverdue = (s === 'none' && today >= deadlines[idx]);
+                    if (isOverdue) teamNeedsAttention = true;
+                });
+                
                 const percentage = Math.round((filledCount / 7) * 100);
                 totalCompliance += percentage;
                 
-                if (percentage >= 50) onTrackCount++; else attentionCount++;
+                if (teamNeedsAttention) {
+                    attentionCount++;
+                } else {
+                    onTrackCount++;
+                }
 
                 const badgeStyle = window.getMechStyle(item.mech);
                 finalisBody.innerHTML += `
