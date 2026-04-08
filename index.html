@@ -208,16 +208,31 @@
         window.isMasterEditMode = false;
 
         async function init() {
+            const timeout = setTimeout(() => {
+                const loader = document.getElementById('db-loading');
+                if (!loader.classList.contains('hidden')) {
+                    document.getElementById('loading-text').innerText = "Waktu koneksi habis";
+                    document.getElementById('loading-text').classList.add('text-red-600');
+                    document.getElementById('loading-subtext').innerText = "Gagal menghubungi database. Menampilkan data lokal.";
+                    setTimeout(() => {
+                        loader.classList.add('hidden');
+                        renderTables(initialData);
+                    }, 3000);
+                }
+            }, 8000);
+
             try {
                 app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
                 db = getFirestore(app);
 
                 await signInAnonymously(auth);
-                document.getElementById('db-loading').classList.add('hidden');
                 
                 const colRef = collection(db, 'teams');
                 onSnapshot(colRef, (snapshot) => {
+                    clearTimeout(timeout);
+                    document.getElementById('db-loading').classList.add('hidden');
+                    
                     const dataList = [];
                     snapshot.forEach(doc => dataList.push(doc.data()));
 
@@ -227,12 +242,27 @@
                         dataList.sort((a, b) => parseInt(a.id) - parseInt(b.id));
                         renderTables(dataList);
                     }
+                }, (error) => {
+                    clearTimeout(timeout);
+                    console.error(error);
+                    document.getElementById('loading-text').innerText = "Gagal membaca data";
+                    document.getElementById('loading-text').classList.add('text-red-600');
+                    document.getElementById('loading-subtext').innerText = "Pastikan aturan (Rules) Firestore mengizinkan akses baca/tulis.";
+                    setTimeout(() => {
+                        document.getElementById('db-loading').classList.add('hidden');
+                        renderTables(initialData);
+                    }, 3000);
                 });
             } catch (error) {
+                clearTimeout(timeout);
                 console.error(error);
                 document.getElementById('loading-text').innerText = "Gagal menghubungkan ke Database";
                 document.getElementById('loading-text').classList.add('text-red-600');
                 document.getElementById('loading-subtext').innerText = "Pastikan domain GitHub Pages Anda sudah ditambahkan di Firebase Console (Authentication > Settings > Authorized domains).";
+                setTimeout(() => {
+                    document.getElementById('db-loading').classList.add('hidden');
+                    renderTables(initialData);
+                }, 4000);
             }
         }
 
