@@ -20,10 +20,6 @@
         .icon-check { color: #10b981; } 
         .icon-late { color: #ef4444; } 
         .icon-none { color: #cbd5e1; } 
-        
-        .current-month { background-color: #e2e8f0 !important; border-left: 2px solid #1e293b; border-right: 2px solid #1e293b; }
-        th.current-month { border-top: 2px solid #1e293b; color: #1e293b; font-weight: 800; }
-        tr:last-child td.current-month { border-bottom: 2px solid #1e293b; }
 
         select.status-select, select.mech-select {
             -webkit-appearance: none; appearance: none; width: 100%; text-align: center; background-color: rgba(255,255,255,0.9);
@@ -101,7 +97,7 @@
                             <th class="p-4 min-w-[250px]">Judul Project Inovasi</th>
                             <th class="p-4 w-40 text-center">Mekanisme</th>
                             <th class="p-4 w-40 text-center">Mekanisme Tambahan</th>
-                            <th class="p-4 w-40">Kepatuhan (x/7)</th>
+                            <th class="p-4 w-40">Kepatuhan (x/6)</th>
                             <th class="p-4 min-w-[150px]">Keterangan</th>
                             <th class="p-4 w-16 text-center">Aksi</th>
                         </tr>
@@ -142,8 +138,7 @@
                             <th class="p-4 min-w-[120px] text-center" data-month="2">Mar<br><span class="text-[10px] text-slate-400 font-normal">Batas 10 Apr</span></th>
                             <th class="p-4 min-w-[120px] text-center" data-month="3">Apr<br><span class="text-[10px] text-slate-400 font-normal">Batas 10 Mei</span></th>
                             <th class="p-4 min-w-[120px] text-center" data-month="4">Mei<br><span class="text-[10px] text-slate-400 font-normal">Batas 10 Jun</span></th>
-                            <th class="p-4 min-w-[120px] text-center" data-month="5">Jun<br><span class="text-[10px] text-slate-400 font-normal">Batas 10 Jul</span></th>
-                            <th class="p-4 min-w-[120px] text-center bg-blue-50 text-blue-800">Akhir<br><span class="text-[10px] text-blue-500 font-normal">Batas 10 Ags</span></th>
+                            <th class="p-4 min-w-[120px] text-center" data-month="5">Jun (Lap Akhir)<br><span class="text-[10px] text-slate-400 font-normal">Batas 10 Jul</span></th>
                             <th class="p-4 w-16 text-center">Aksi</th>
                         </tr>
                     </thead>
@@ -179,16 +174,16 @@
 
         // Data awal termasuk array progress
         window.initialData = [
-            { "id": "1", "unit": "KPKNL Pekanbaru", "kanwil": "Kanwil Riau, Sumbar & Kepri", "title": "Pemanfaatan BMN Sebagian Tanah LPP RRI Pekanbaru Untuk Madani Trade Center", "mech": "", "mechAdd": "", "status": ["none", "none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", "", ""], "ket": "Implemented: perjanjian sewa ada, pemanfaatan aktif" },
-            { "id": "2", "unit": "KPKNL Padang", "kanwil": "Kanwil Riau, Sumbar & Kepri", "title": "Optimalisasi Sebagian Tanah/Bangunan Pelabuhan Perikanan Samudera Bungus untuk Sentra Tuna Sumbar", "mech": "", "mechAdd": "", "status": ["none", "none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", "", ""], "ket": "Implemented (non-komersial): pemanfaatan sosial berjalan dengan dasar perjanjian" },
-            { "id": "3", "unit": "KPKNL Jakarta I", "kanwil": "Kanwil DKI Jakarta", "title": "KSP BMN Berupa Tanah Untuk Pembangunan International Student Housing Pada Universitas Indonesia", "mech": "", "mechAdd": "", "status": ["none", "none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", "", ""], "ket": "Pra-legalisasi: konsep optimalisasi & penjajakan mitra" },
-            { "id": "4", "unit": "KPKNL Jakarta II", "kanwil": "Kanwil DKI Jakarta", "title": "EMPOWERING VOICES: Unified, Inclusive, and Empowered Public Services: State Assets for All", "mech": "", "mechAdd": "", "status": ["none", "none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", "", ""], "ket": "Konseptual: belum masuk tahap persetujuan formal" },
-            { "id": "5", "unit": "KPKNL Jakarta III", "kanwil": "Kanwil DKI Jakarta", "title": "Kawasan Masjid Istiqlal sebagai Ekosistem Aset Berbasis Spiritual, Edukasi, dan Ekonomi Kreatif", "mech": "", "mechAdd": "", "status": ["none", "none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", "", ""], "ket": "Pra-legalisasi: pemetaan & penertiban, belum ada persetujuan/perjanjian" },
-            { "id": "6", "unit": "KPKNL Purwokerto", "kanwil": "Kanwil Jateng & DIY", "title": "Pemanfaatan Farm Manggala Aset BMN Pada Balai Besar Pembibitan Ternak Unggul (Baturraden)", "mech": "", "mechAdd": "", "status": ["none", "none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", "", ""], "ket": "Implemented: pemanfaatan berjalan dengan dasar kontraktual" },
-            { "id": "7", "unit": "KPKNL Malang", "kanwil": "Kanwil Jawa Timur", "title": "PETIK ANGGUR-PETIK ILMU BARENG MAS-EE: Optimalisasi Aset Polbangtan Malang", "mech": "", "mechAdd": "", "status": ["none", "none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", "", ""], "ket": "Fully implemented: persetujuan sewa terbit, perjanjian ditandatangani, PNBP terealisasi, operasional berjalan" },
-            { "id": "8", "unit": "KPKNL Tarakan", "kanwil": "Kanwil Kaltim & Utara", "title": "Optimalisasi Aset di Luar Kawasan Bandar Udara Juwata Tarakan melalui Lelang Hak Menikmati", "mech": "", "mechAdd": "", "status": ["none", "none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", "", ""], "ket": "Pra-implementasi lanjut: penilaian sewa selesai, menunggu persetujuan & lelang" },
-            { "id": "9", "unit": "KPKNL Palopo", "kanwil": "Kanwil Sulsel, Tenggara & Barat", "title": "Optimalisasi BMN Tanah & Bangunan PN Palopo Sebagai Public Value Creation", "mech": "", "mechAdd": "", "status": ["none", "none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", "", ""], "ket": "Pra-legalisasi: koordinasi & penyiapan dokumen, belum ada persetujuan" },
-            { "id": "10", "unit": "KPKNL Ternate", "kanwil": "Kanwil Suluttenggomalut", "title": "Optimalisasi BMN untuk Ketahanan Pangan dan Kesejahteraan Masyarakat", "mech": "", "mechAdd": "", "status": ["none", "none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", "", ""], "ket": "Legalisasi parsial: persetujuan sewa terbit, perjanjian belum ditandatangani (de facto berjalan)" }
+            { "id": "1", "unit": "KPKNL Pekanbaru", "kanwil": "Kanwil Riau, Sumbar & Kepri", "title": "Pemanfaatan BMN Sebagian Tanah LPP RRI Pekanbaru Untuk Madani Trade Center", "mech": "", "mechAdd": "", "status": ["none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", ""], "ket": "Implemented: perjanjian sewa ada, pemanfaatan aktif" },
+            { "id": "2", "unit": "KPKNL Padang", "kanwil": "Kanwil Riau, Sumbar & Kepri", "title": "Optimalisasi Sebagian Tanah/Bangunan Pelabuhan Perikanan Samudera Bungus untuk Sentra Tuna Sumbar", "mech": "", "mechAdd": "", "status": ["none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", ""], "ket": "Implemented (non-komersial): pemanfaatan sosial berjalan dengan dasar perjanjian" },
+            { "id": "3", "unit": "KPKNL Jakarta I", "kanwil": "Kanwil DKI Jakarta", "title": "KSP BMN Berupa Tanah Untuk Pembangunan International Student Housing Pada Universitas Indonesia", "mech": "", "mechAdd": "", "status": ["none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", ""], "ket": "Pra-legalisasi: konsep optimalisasi & penjajakan mitra" },
+            { "id": "4", "unit": "KPKNL Jakarta II", "kanwil": "Kanwil DKI Jakarta", "title": "EMPOWERING VOICES: Unified, Inclusive, and Empowered Public Services: State Assets for All", "mech": "", "mechAdd": "", "status": ["none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", ""], "ket": "Konseptual: belum masuk tahap persetujuan formal" },
+            { "id": "5", "unit": "KPKNL Jakarta III", "kanwil": "Kanwil DKI Jakarta", "title": "Kawasan Masjid Istiqlal sebagai Ekosistem Aset Berbasis Spiritual, Edukasi, dan Ekonomi Kreatif", "mech": "", "mechAdd": "", "status": ["none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", ""], "ket": "Pra-legalisasi: pemetaan & penertiban, belum ada persetujuan/perjanjian" },
+            { "id": "6", "unit": "KPKNL Purwokerto", "kanwil": "Kanwil Jateng & DIY", "title": "Pemanfaatan Farm Manggala Aset BMN Pada Balai Besar Pembibitan Ternak Unggul (Baturraden)", "mech": "", "mechAdd": "", "status": ["none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", ""], "ket": "Implemented: pemanfaatan berjalan dengan dasar kontraktual" },
+            { "id": "7", "unit": "KPKNL Malang", "kanwil": "Kanwil Jawa Timur", "title": "PETIK ANGGUR-PETIK ILMU BARENG MAS-EE: Optimalisasi Aset Polbangtan Malang", "mech": "", "mechAdd": "", "status": ["none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", ""], "ket": "Fully implemented: persetujuan sewa terbit, perjanjian ditandatangani, PNBP terealisasi, operasional berjalan" },
+            { "id": "8", "unit": "KPKNL Tarakan", "kanwil": "Kanwil Kaltim & Utara", "title": "Optimalisasi Aset di Luar Kawasan Bandar Udara Juwata Tarakan melalui Lelang Hak Menikmati", "mech": "", "mechAdd": "", "status": ["none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", ""], "ket": "Pra-implementasi lanjut: penilaian sewa selesai, menunggu persetujuan & lelang" },
+            { "id": "9", "unit": "KPKNL Palopo", "kanwil": "Kanwil Sulsel, Tenggara & Barat", "title": "Optimalisasi BMN Tanah & Bangunan PN Palopo Sebagai Public Value Creation", "mech": "", "mechAdd": "", "status": ["none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", ""], "ket": "Pra-legalisasi: koordinasi & penyiapan dokumen, belum ada persetujuan" },
+            { "id": "10", "unit": "KPKNL Ternate", "kanwil": "Kanwil Suluttenggomalut", "title": "Optimalisasi BMN untuk Ketahanan Pangan dan Kesejahteraan Masyarakat", "mech": "", "mechAdd": "", "status": ["none", "none", "none", "none", "none", "none"], "progress": ["", "", "", "", "", ""], "ket": "Legalisasi parsial: persetujuan sewa terbit, perjanjian belum ditandatangani (de facto berjalan)" }
         ];
 
         window.renderTables = function(data) {
@@ -209,8 +204,7 @@
                 new Date(2026, 3, 11), // Batas Mar: 10 Apr 2026
                 new Date(2026, 4, 11), // Batas Apr: 10 Mei 2026
                 new Date(2026, 5, 11), // Batas Mei: 10 Jun 2026
-                new Date(2026, 6, 11), // Batas Jun: 10 Jul 2026
-                new Date(2026, 7, 11)  // Batas Akhir: 10 Ags 2026
+                new Date(2026, 6, 11)  // Batas Jun (Lap Akhir): 10 Jul 2026
             ];
             const today = new Date();
 
@@ -218,13 +212,14 @@
                 let filledCount = 0;
                 let teamNeedsAttention = false;
 
-                item.status.forEach((s, idx) => {
+                // Menggunakan slice(0, 6) untuk mengabaikan data bulan ke-7 jika masih ada di Firebase lama
+                item.status.slice(0, 6).forEach((s, idx) => {
                     if(s === 'check' || s === 'late') filledCount++;
                     let isOverdue = (s === 'none' && today >= deadlines[idx]);
                     if (isOverdue) teamNeedsAttention = true;
                 });
                 
-                const percentage = Math.round((filledCount / 7) * 100);
+                const percentage = Math.round((filledCount / 6) * 100);
                 totalCompliance += percentage;
                 
                 if (teamNeedsAttention) {
@@ -248,9 +243,9 @@
                 `;
 
                 let statusHtml = '';
-                const progArray = item.progress || ["", "", "", "", "", "", ""];
+                const progArray = (item.progress || ["", "", "", "", "", ""]).slice(0, 6);
                 
-                item.status.forEach((s, idx) => {
+                item.status.slice(0, 6).forEach((s, idx) => {
                     let icon = '<i class="fas fa-minus icon-none"></i>';
                     if(s === 'check') icon = '<i class="fas fa-check-circle icon-check"></i>';
                     if(s === 'late') icon = '<i class="fas fa-check-circle icon-late"></i>';
@@ -290,7 +285,6 @@
                 document.getElementById('stat-ontrack').innerText = onTrackCount;
                 document.getElementById('stat-atensi').innerText = attentionCount;
             }
-            window.highlightCurrentMonth();
         };
 
         window.getMechStyle = function(val) {
@@ -307,14 +301,6 @@
             const now = new Date();
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
             document.getElementById('currentDateDisplay').textContent = now.toLocaleDateString('id-ID', options);
-        };
-
-        window.highlightCurrentMonth = function() {
-            const now = new Date();
-            const currentMonth = now.getMonth();
-            if (currentMonth >= 0 && currentMonth <= 5) {
-                document.querySelectorAll(`[data-month="${currentMonth}"]`).forEach(el => el.classList.add('current-month'));
-            }
         };
 
         window.switchTab = function(tabName) {
